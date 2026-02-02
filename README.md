@@ -1,36 +1,12 @@
-
 # Personal Website
 
-A high-performance personal website built with HTML, Tailwind CSS, and TypeScript.
+Welcome! This is a high-performance personal website built with HTML, Tailwind CSS, and JavaScript.
 
 ## Tech Stack
 
 - **Vite** - Lightning-fast build tool
 - **Tailwind CSS** - Utility-first CSS framework
-- **TypeScript** - Type-safe JavaScript
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+ 
-- npm or pnpm
-
-### Installation
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-```
+- **JavaScript** - Modern ES modules
 
 ## Project Structure
 
@@ -42,11 +18,10 @@ npm run preview
 ├── src/
 │   ├── styles/
 │   │   └── main.css          # Tailwind CSS styles
-│   └── main.ts               # TypeScript entry point
+│   └── main.js               # JavaScript entry point
 ├── index.html                # Main HTML file
 ├── tailwind.config.js        # Tailwind configuration
-├── vite.config.ts            # Vite configuration
-└── tsconfig.json             # TypeScript configuration
+└── vite.config.js            # Vite configuration
 ```
 
 ## Blog Integration (MKDocs)
