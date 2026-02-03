@@ -118,6 +118,46 @@ mobileNavLinks?.forEach((link) => {
 // Navbar scroll effect
 const navbar = document.getElementById('navbar')
 
+// Active section highlighting
+const sections = document.querySelectorAll('section[id]')
+const navLinks = document.querySelectorAll('.nav-link[href^="#"]')
+
+const setActiveLink = (id) => {
+  if (!id) return
+  navLinks.forEach((link) => {
+    link.classList.remove('nav-link-active')
+    if (link.getAttribute('href') === `#${id}`) {
+      link.classList.add('nav-link-active')
+    }
+  })
+}
+
+const setActiveLinkForBottom = () => {
+  if (!navLinks.length) return
+  const atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 2
+  if (atBottom) {
+    setActiveLink('about')
+  }
+}
+
+const setActiveLinkFromScroll = () => {
+  if (!sections.length) return
+  const probeY = window.scrollY + window.innerHeight * 0.35
+  let activeId = null
+
+  sections.forEach((section) => {
+    const top = section.offsetTop
+    const bottom = top + section.offsetHeight
+    if (probeY >= top && probeY < bottom) {
+      activeId = section.getAttribute('id')
+    }
+  })
+
+  if (activeId) {
+    setActiveLink(activeId)
+  }
+}
+
 const handleScroll = () => {
   const currentScrollY = window.scrollY
 
@@ -128,6 +168,9 @@ const handleScroll = () => {
       navbar.classList.remove('bg-[#0f172a]/95', 'backdrop-blur-md', 'shadow-lg')
     }
   }
+
+  setActiveLinkFromScroll()
+  setActiveLinkForBottom()
 }
 
 window.addEventListener('scroll', handleScroll, { passive: true })
@@ -164,29 +207,7 @@ if (certCarousel && certPrevBtn && certNextBtn) {
   updateButtonStates()
 }
 
-// Active section highlighting
-const sections = document.querySelectorAll('section[id]')
-const navLinks = document.querySelectorAll('.nav-link[href^="#"]')
-
-const observerOptions = {
-  rootMargin: '-20% 0px -80% 0px',
-}
-
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach((entry) => {
-    if (entry.isIntersecting) {
-      const id = entry.target.getAttribute('id')
-      navLinks.forEach((link) => {
-        link.classList.remove('nav-link-active')
-        if (link.getAttribute('href') === `#${id}`) {
-          link.classList.add('nav-link-active')
-        }
-      })
-    }
-  })
-}, observerOptions)
-
-sections.forEach((section) => observer.observe(section))
+setActiveLinkFromScroll()
 
 // Fade in animation on scroll
 const fadeElements = document.querySelectorAll('.fade-in')
