@@ -181,6 +181,10 @@
     @apply w-full h-full object-contain;
   }
 
+  .cert-badge img.aws-cert-badge {
+    transform: scale(1.50);
+  }
+
   
   /* Project card with image */
   .project-image-placeholder {
