@@ -83,7 +83,7 @@
   }
   
   .section-title {
-    @apply text-2xl font-bold text-white flex items-center gap-3 mb-8 py-2;
+    @apply text-2xl font-bold text-white flex items-center gap-3 mb-3 py-2;
   }
   
   html.light .section-title {
@@ -139,29 +139,84 @@
     @apply w-5 h-5;
   }
 
+  .icon-\[logos--python\] {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: url("/images/LogosPython.svg") center / contain no-repeat;
+    flex-shrink: 0;
+  }
+
+  .project-tech-tag .icon-\[logos--python\] {
+    width: 14px;
+    height: 14px;
+  }
+
+  .tech-tile img.logo-contrast {
+    @apply rounded bg-white/90 p-0.5;
+    box-sizing: content-box;
+  }
+
+  .tech-tile img.logo-contrast-strong {
+    @apply rounded bg-white p-0.5;
+    box-sizing: content-box;
+  }
+
   html.light .tech-tile {
     @apply border-gray-200 bg-white text-gray-700;
   }
   
   /* Certification Carousel */
-  .cert-carousel-container {
-    @apply relative flex items-center gap-4;
+  .cert-carousel-shell {
+    @apply relative;
+  }
+
+  .cert-carousel-frame {
+    @apply overflow-hidden py-2;
+    --cert-gap: 12px;
+    --cert-visible: 4;
   }
   
   .cert-carousel {
-    @apply flex gap-4 overflow-hidden scroll-smooth py-4 -my-4;
+    @apply flex scroll-smooth py-2;
+    gap: var(--cert-gap);
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: visible;
+    scrollbar-width: none;
+    width: 100%;
+  }
+
+  .cert-carousel::-webkit-scrollbar {
+    display: none;
   }
   
   .cert-card {
-    @apply flex-shrink-0 bg-dark-800/50 rounded-xl p-6 border border-dark-600/50 transition-all duration-300 text-center cursor-pointer;
-    width: calc((100% - 64px) / 4);
-    min-width: 220px;
+    @apply flex-shrink-0 bg-dark-800/50 rounded-xl p-6 border border-dark-600/50 transition-all duration-300 text-center cursor-pointer flex flex-col items-center;
+    flex: 0 0 calc((100% - (var(--cert-gap) * (var(--cert-visible) - 1))) / var(--cert-visible));
+    width: calc((100% - (var(--cert-gap) * (var(--cert-visible) - 1))) / var(--cert-visible));
+    min-width: 0;
+    min-height: 260px;
   }
   
   .cert-card:hover {
     @apply border-accent-yellow/60;
     box-shadow: 0 0 20px rgba(251, 191, 36, 0.3), 0 0 40px rgba(251, 191, 36, 0.1);
     transform: translateY(-2px);
+  }
+
+  .cert-nav-btn {
+    @apply absolute top-1/2 -translate-y-1/2;
+    z-index: 20;
+    pointer-events: auto;
+  }
+
+  .cert-nav-btn-left {
+    left: -48px;
+  }
+
+  .cert-nav-btn-right {
+    right: -48px;
   }
   
   html.light .cert-card {
@@ -174,15 +229,27 @@
   }
   
   .cert-badge {
-    @apply w-28 h-28 mx-auto mb-4 flex items-center justify-center;
+    @apply w-32 h-32 mx-auto mb-4 flex items-center justify-center;
+    display: grid;
+    place-items: center;
   }
 
   .cert-badge img {
-    @apply w-full h-full object-contain;
+    @apply w-full h-full object-contain block;
+    object-position: 48% center;
+    margin-left: auto;
+    margin-right: auto;
+    transform-origin: center center;
   }
 
   .cert-badge img.aws-cert-badge {
-    transform: scale(1.50);
+    transform: translateX(5px) scale(1.35);
+  }
+
+  .cert-card h3,
+  .cert-card p {
+    width: 100%;
+    text-align: center;
   }
 
   
@@ -249,6 +316,11 @@
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .py-18 {
+    padding-top: 4.5rem;
+    padding-bottom: 4.5rem;
   }
 }
 

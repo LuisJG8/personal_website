@@ -181,30 +181,151 @@ const certPrevBtn = document.getElementById('cert-prev')
 const certNextBtn = document.getElementById('cert-next')
 
 if (certCarousel && certPrevBtn && certNextBtn) {
-  const scrollAmount = 1025 // Scroll by ~3 cards at a time for faster navigation
+  const certSection = document.getElementById('certifications')
+  const certCards = Array.from(certCarousel.querySelectorAll('.cert-card'))
+  let useTransformFallback = false
 
-  const updateButtonStates = () => {
-    const isAtStart = certCarousel.scrollLeft <= 0
-    const isAtEnd = certCarousel.scrollLeft >= certCarousel.scrollWidth - certCarousel.clientWidth - 10
-
-    certPrevBtn.disabled = isAtStart
-    certNextBtn.disabled = isAtEnd
+  const getGap = () => {
+    const styles = window.getComputedStyle(certCarousel)
+    return parseFloat(styles.columnGap || styles.gap || '0') || 0
   }
 
-  certPrevBtn.addEventListener('click', () => {
-    certCarousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' })
-    setTimeout(updateButtonStates, 300)
-  })
+  const getMetrics = () => {
+    const frame = certCarousel.parentElement
+    const configuredVisible = frame
+      ? Math.max(1, parseInt(window.getComputedStyle(frame).getPropertyValue('--cert-visible') || '4', 10))
+      : 4
 
-  certNextBtn.addEventListener('click', () => {
-    certCarousel.scrollBy({ left: scrollAmount, behavior: 'smooth' })
-    setTimeout(updateButtonStates, 300)
-  })
+    const firstCard = certCards[0]
+    if (!firstCard) {
+      return {
+        step: certCarousel.clientWidth || 1,
+        visibleCards: 1,
+        maxIndex: 0,
+      }
+    }
 
-  certCarousel.addEventListener('scroll', updateButtonStates, { passive: true })
+    const measuredCardWidth = firstCard.getBoundingClientRect().width
+    const fallbackCardWidth = certCarousel.clientWidth > 0 ? certCarousel.clientWidth / configuredVisible : 0
+    const cardWidth = measuredCardWidth > 0 ? measuredCardWidth : fallbackCardWidth
+    const step = Math.max(1, cardWidth + getGap())
+    const inferredVisible = Math.max(1, Math.floor((certCarousel.clientWidth + getGap()) / step))
+    const visibleCards = Math.max(1, Math.min(configuredVisible, inferredVisible, certCards.length))
+    const maxIndex = Math.max(0, certCards.length - visibleCards)
+
+    return { step, visibleCards, maxIndex }
+  }
+
+  let currentIndex = 0
+
+  const updateCurrentIndexFromScroll = () => {
+    if (useTransformFallback) return
+
+    const { step, maxIndex } = getMetrics()
+    if (!step) {
+      currentIndex = 0
+      return
+    }
+
+    currentIndex = Math.max(0, Math.min(maxIndex, Math.round(certCarousel.scrollLeft / step)))
+  }
+
+  const updateButtonStates = () => {
+    const { maxIndex } = getMetrics()
+    certPrevBtn.disabled = currentIndex <= 0
+    certNextBtn.disabled = currentIndex >= maxIndex
+  }
+
+  const applyTransformOffset = (left, behavior = 'smooth') => {
+    certCarousel.style.willChange = 'transform'
+    certCarousel.style.transition = behavior === 'smooth' ? 'transform 260ms ease' : 'none'
+    certCarousel.style.transform = `translate3d(${-left}px, 0, 0)`
+  }
+
+  const setCarouselPosition = (targetIndex, behavior = 'smooth') => {
+    const { step, maxIndex } = getMetrics()
+    const nextIndex = Math.max(0, Math.min(maxIndex, targetIndex))
+    currentIndex = nextIndex
+    const left = nextIndex * step
+
+    if (useTransformFallback) {
+      applyTransformOffset(left, behavior)
+      updateButtonStates()
+      return
+    }
+
+    if (typeof certCarousel.scrollTo === 'function') {
+      try {
+        certCarousel.scrollTo({ left, behavior })
+      } catch {
+        certCarousel.scrollLeft = left
+      }
+    } else {
+      certCarousel.scrollLeft = left
+    }
+
+    window.setTimeout(() => {
+      const canActuallyScroll = certCarousel.scrollWidth - certCarousel.clientWidth > 1
+      if (!canActuallyScroll && left > 0) {
+        useTransformFallback = true
+        applyTransformOffset(left, behavior)
+      }
+
+      updateCurrentIndexFromScroll()
+      updateButtonStates()
+    }, 260)
+  }
+
+  const scrollCerts = (direction) => {
+    const { visibleCards } = getMetrics()
+    setCarouselPosition(currentIndex + direction * visibleCards)
+  }
+
+  certPrevBtn.addEventListener('click', () => scrollCerts(-1))
+  certNextBtn.addEventListener('click', () => scrollCerts(1))
+
+  certCarousel.addEventListener(
+    'scroll',
+    () => {
+      updateCurrentIndexFromScroll()
+      updateButtonStates()
+    },
+    { passive: true }
+  )
+  window.addEventListener(
+    'resize',
+    () => {
+      setCarouselPosition(currentIndex, 'auto')
+    },
+    { passive: true }
+  )
+
+  window.addEventListener('keydown', (event) => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+
+    const target = event.target
+    const isTextInput =
+      target instanceof HTMLElement &&
+      (target.isContentEditable || target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT')
+    if (isTextInput) return
+
+    if (certSection) {
+      const sectionRect = certSection.getBoundingClientRect()
+      const isInView = sectionRect.top < window.innerHeight && sectionRect.bottom > 0
+      if (!isInView) return
+    }
+
+    event.preventDefault()
+    scrollCerts(event.key === 'ArrowLeft' ? -1 : 1)
+  })
 
   // Initial state
+  updateCurrentIndexFromScroll()
   updateButtonStates()
+  window.requestAnimationFrame(() => {
+    updateCurrentIndexFromScroll()
+    updateButtonStates()
+  })
 }
 
 setActiveLinkFromScroll()
