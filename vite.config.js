@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite'
 
-export default defineConfig(({ command }) => ({
-  // GitHub Pages serves project sites from /<repo-name>/ in production.
-  base: command === 'build' ? '/personal_website/' : '/',
+export default defineConfig({
+  // Custom domains are served from the site root.
+  base: '/',
   build: {
     minify: 'esbuild',
     cssMinify: true,
@@ -18,4 +18,4 @@ export default defineConfig(({ command }) => ({
   server: {
     open: true,
   },
-}))
+})
