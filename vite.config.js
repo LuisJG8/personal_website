@@ -1,22 +1,21 @@
 import { defineConfig } from 'vite'
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  // GitHub Pages serves project sites from /<repo-name>/ in production.
+  base: command === 'build' ? '/personal-website/' : '/',
   build: {
-    minify: 'terser',
+    minify: 'esbuild',
     cssMinify: true,
     rollupOptions: {
       output: {
         manualChunks: undefined,
       },
     },
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-      },
-    },
+  },
+  esbuild: {
+    drop: ['console', 'debugger'],
   },
   server: {
     open: true,
   },
-})
+}))
