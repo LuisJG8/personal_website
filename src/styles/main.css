@@ -100,12 +100,69 @@
     @apply border-gray-300 bg-white;
   }
   
-  .timeline-dot {
-    @apply w-3 h-3 rounded-full bg-accent-yellow border-2 border-dark-900 shadow-lg shadow-accent-yellow/20;
+  .experience-timeline {
+    @apply ml-1.5 list-none space-y-12 border-l-2 border-white/15 pb-8 md:ml-5 md:space-y-16 md:pb-14;
   }
-  
-  html.light .timeline-dot {
-    @apply border-white;
+
+  .experience-entry {
+    @apply relative grid gap-y-4 pl-5 md:min-h-32 md:grid-cols-[minmax(0,5fr)_minmax(0,8fr)] md:gap-x-8 md:px-8;
+  }
+
+  .experience-entry::before {
+    content: '';
+    @apply absolute -left-px top-[0.625rem] size-2.5 -translate-x-1/2 rounded-full bg-yellow-400;
+  }
+
+  .experience-entry-current::before {
+    box-shadow: 0 0 6px 4px rgb(250 204 21 / 0.27);
+  }
+
+  .experience-role {
+    @apply text-xl font-bold leading-6 text-yellow-400;
+  }
+
+  .experience-company {
+    @apply mt-1 text-xl font-bold leading-6 text-white;
+  }
+
+  .experience-dates {
+    @apply mt-1.5 text-sm text-gray-300;
+  }
+
+  .experience-meta,
+  .experience-skills {
+    @apply text-sm leading-relaxed text-gray-400;
+  }
+
+  .experience-meta {
+    @apply mt-1;
+  }
+
+  .experience-details {
+    @apply space-y-2 text-base leading-6 text-gray-300;
+  }
+
+  html.light .experience-timeline {
+    @apply border-slate-300;
+  }
+
+  html.light .experience-entry::before {
+    @apply bg-amber-600;
+  }
+
+  html.light .experience-entry-current::before {
+    box-shadow: 0 0 6px 4px rgb(217 119 6 / 0.18);
+  }
+
+  html.light .experience-role {
+    @apply text-amber-800;
+  }
+
+  html.light .experience-dates,
+  html.light .experience-meta,
+  html.light .experience-details,
+  html.light .experience-skills {
+    @apply text-gray-600;
   }
   
   .card {

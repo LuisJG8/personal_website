@@ -127,7 +127,7 @@ talkFilters.forEach((button) => {
 // Keep links to the original homepage sections working.
 if (document.getElementById('hero')) {
   const redirectToSection = () => {
-    const oldSection = window.location.hash.match(/^#(experience|talks|projects)$/)
+    const oldSection = window.location.hash.match(/^#(experience|talks|projects|blog)$/)
     if (oldSection) {
       window.location.replace(`/${oldSection[1]}/${window.location.search}`)
     }
