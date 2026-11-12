@@ -1,14 +1,5 @@
 import './styles/main.css'
 
-const galtonCanvas = document.getElementById('galton-canvas')
-if (galtonCanvas) {
-  import('./galton-board.js').then(({ initGaltonBoard }) => {
-    initGaltonBoard(galtonCanvas, document.getElementById('galton-flip'), document.getElementById('galton-status'))
-  }).catch(() => {
-    document.getElementById('galton-status').textContent = 'The board could not load. Refresh the page to try again.'
-  })
-}
-
 const createFallbackSvg = () => {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
   svg.setAttribute('class', 'w-12 h-12 text-gray-600')

@@ -116,14 +116,6 @@
     @apply underline underline-offset-4 hover:no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2;
   }
 
-  .galton-stage {
-    @apply overflow-hidden rounded-2xl border border-white/20 bg-[#101827];
-  }
-
-  html.light .galton-stage {
-    @apply border-slate-300 bg-white;
-  }
-
   html.light .bio-portrait {
     @apply border-gray-300 bg-white;
   }
