@@ -56,24 +56,4 @@
           </div>
         </div>
       </div>
-
-      <section id="galton-board" class="mx-auto mt-16 max-w-xl scroll-mt-24 border-t border-gray-700 pt-8" aria-labelledby="galton-title">
-        <div class="mb-5 flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h2 id="galton-title" class="text-xl font-semibold text-white">Galton board</h2>
-            <p id="galton-description" class="mt-2 max-w-sm text-sm text-white">Flip to fill the hopper. Flip again to watch the bell curve form.</p>
-          </div>
-          <button id="galton-flip" type="button" disabled aria-controls="galton-canvas" aria-describedby="galton-status"
-                  class="btn-primary shrink-0 text-white disabled:cursor-wait disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4">
-            Flip board
-          </button>
-        </div>
-        <div class="galton-stage mx-auto max-w-[440px]">
-          <canvas id="galton-canvas" width="560" height="900" role="img" aria-label="An interactive Galton board with a top hopper, triangular white pegs, and collection bins" aria-describedby="galton-description galton-status" class="block h-auto w-full">
-            Your browser needs canvas support to show the Galton board.
-          </canvas>
-        </div>
-        <p id="galton-status" role="status" aria-live="polite" aria-atomic="true" class="mt-4 min-h-5 text-sm text-white">Preparing the board…</p>
-        <noscript><p class="mt-2 text-sm text-white">Enable JavaScript to flip the board.</p></noscript>
-      </section>
     </section>
