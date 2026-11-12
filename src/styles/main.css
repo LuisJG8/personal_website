@@ -39,7 +39,7 @@
 
 @layer components {
   .nav-link {
-    @apply text-gray-400 hover:text-white transition-colors duration-200 text-sm font-medium;
+    @apply text-white hover:text-white transition-colors duration-200 text-sm font-medium;
   }
   
   html.light .nav-link {
@@ -76,15 +76,31 @@
   }
 
   .project-tech-tag {
-    @apply inline-flex items-center gap-1.5 px-2 py-1 bg-dark-700 text-xs text-gray-400 rounded;
+    @apply inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium text-white;
   }
 
   .project-tech-tag img {
-    @apply w-3.5 h-3.5;
+    @apply size-4 shrink-0;
   }
 
   html.light .project-tech-tag {
-    @apply bg-gray-100 text-gray-600;
+    color: #fff;
+  }
+
+  .project-action {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-gray-600 bg-gray-800 px-3 py-2 text-base font-medium text-white transition-colors hover:border-gray-400 hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-yellow;
+  }
+
+  html.light .project-action {
+    @apply border-gray-300 bg-gray-100 text-gray-900 hover:border-gray-400 hover:bg-gray-200;
+  }
+
+  html.light .project-action img {
+    filter: brightness(0);
+  }
+
+  html.light #projects .text-gray-300 {
+    @apply text-gray-600;
   }
 
   .bio-emphasis {
@@ -94,6 +110,18 @@
 
   html.light .bio-emphasis {
     @apply text-amber-800;
+  }
+
+  .bio-link {
+    @apply underline underline-offset-4 hover:no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2;
+  }
+
+  .galton-stage {
+    @apply overflow-hidden rounded-2xl border border-white/20 bg-[#101827];
+  }
+
+  html.light .galton-stage {
+    @apply border-slate-300 bg-white;
   }
 
   html.light .bio-portrait {
@@ -126,16 +154,11 @@
   }
 
   .experience-dates {
-    @apply mt-1.5 text-sm text-gray-300;
-  }
-
-  .experience-meta,
-  .experience-skills {
-    @apply text-sm leading-relaxed text-gray-400;
+    @apply mt-1.5 text-sm text-white;
   }
 
   .experience-meta {
-    @apply mt-1;
+    @apply mt-1 text-sm leading-relaxed text-white;
   }
 
   .experience-details {
@@ -160,8 +183,7 @@
 
   html.light .experience-dates,
   html.light .experience-meta,
-  html.light .experience-details,
-  html.light .experience-skills {
+  html.light .experience-details {
     @apply text-gray-600;
   }
   
