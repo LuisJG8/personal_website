@@ -138,3 +138,17 @@ if (document.getElementById('hero')) {
 }
 
 console.log('Personal website loaded successfully!')
+
+// Load the live 3D experiment only on the page that contains it.
+const galtonEmbed = document.querySelector('[data-galton-embed]')
+if (galtonEmbed) {
+  import('./galton/embed.ts')
+    .then(({ mountGaltonBoard }) => {
+      const dispose = mountGaltonBoard(galtonEmbed)
+      window.addEventListener('pagehide', (event) => { if (!event.persisted) dispose() })
+    })
+    .catch((error) => {
+      console.error('Could not load the Galton experiment.', error)
+      galtonEmbed.querySelector('[data-galton-canvas]').textContent = 'The board could not load. Try refreshing the page.'
+    })
+}

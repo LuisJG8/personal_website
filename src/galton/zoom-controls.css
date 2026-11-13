@@ -1,0 +1,6 @@
+.galton-zoom-stage{position:relative}
+.galton-zoom-controls{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:5px;z-index:1}
+.galton-zoom-controls button{display:grid;place-items:center;width:40px;height:40px;padding:0;border:1px solid #c5cbbf;border-radius:7px;background:#f9faf7;color:#334731;font-family:Arial,sans-serif;font-size:24px;line-height:1;box-shadow:0 2px 8px #1a291112;cursor:pointer;touch-action:manipulation}
+.galton-zoom-controls button:hover:not(:disabled){background:#fff;border-color:#8d9a82}
+.galton-zoom-controls button:focus-visible{outline:2px solid #8f6b22;outline-offset:3px}
+.galton-zoom-controls button:disabled{opacity:.4;cursor:default}

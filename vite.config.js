@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
 
-const pages = ['index.html', 'experience/index.html', 'talks/index.html', 'projects/index.html', 'blog/index.html']
+const pages = ['index.html', 'experience/index.html', 'talks/index.html', 'projects/index.html', 'projects/galton-board/index.html', 'blog/index.html']
 const layoutFile = new URL('./src/layout.html', import.meta.url)
 const contentMarker = '<!-- Page content -->'
 
