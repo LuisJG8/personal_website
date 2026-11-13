@@ -10,13 +10,19 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck:galton": "tsc --project src/galton/tsconfig.json --noEmit",
+    "test:galton": "node --experimental-strip-types --test tests/galton-probability.test.ts"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.18",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3",
-    "vite": "^8.0.14"
+    "vite": "^8.0.14",
+    "@types/three": "0.184.1"
+  },
+  "dependencies": {
+    "three": "0.187.0"
   }
 }
