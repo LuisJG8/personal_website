@@ -1,4 +1,5 @@
 import './styles/main.css'
+import './event-gallery.js'
 
 const createFallbackSvg = () => {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
