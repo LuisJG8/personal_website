@@ -17,7 +17,9 @@ type Ball = {
     target: THREE.Vector3;
     start: THREE.Vector3;
 };
-const TOP = 2.85, DY = .235, FLOOR = -5.42, RADIUS = .036;
+const TOP = 2.85, DY = .235, FLOOR = -5.42;
+const MINIATURE_PACKING = { columns: 4, spacing: .098, rowHeight: .084, radius: .047 };
+const DENSE_PACKING = { columns: 5, spacing: .073, rowHeight: .064, radius: .036 };
 const clamp = (v: number) => Math.max(0, Math.min(1, v));
 export class GaltonBoard {
     private renderer: THREE.WebGLRenderer;
@@ -47,11 +49,16 @@ export class GaltonBoard {
     private curve = new THREE.Group();
     private disposed = false;
     private lastNotify = 0;
-    private angle = .10;
+    private angle = .25;
     private dragX = 0;
     private dragStartX = 0;
     private dragging = false;
     private moved = false;
+    // Larger, separated spheres keep the miniature legible. Dense runs use
+    // smaller spheres so every bin still fits inside the physical chamber.
+    private get packing() {
+        return this.count > 900 ? DENSE_PACKING : MINIATURE_PACKING;
+    }
     constructor(private host: HTMLElement, onState: (state: BoardState) => void, private onFlip: () => void) {
         this.onState = onState;
         this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -112,24 +119,24 @@ export class GaltonBoard {
         return m;
     }
     private buildMachine() {
-        const black = new THREE.MeshStandardMaterial({ color: 0x242727, roughness: .33, metalness: .45 });
+        const frame = new THREE.MeshStandardMaterial({ color: 0xfbbf24, roughness: .33, metalness: .45 });
         const silver = new THREE.MeshStandardMaterial({ color: 0xc6d5d9, metalness: .72, roughness: .2 });
-        const glass = new THREE.MeshPhysicalMaterial({ color: 0xb9cde7, metalness: 0, roughness: .12, transparent: true, opacity: .2, depthWrite: false, side: THREE.DoubleSide });
+        const glass = new THREE.MeshPhysicalMaterial({ color: 0xd4e4ef, metalness: 0, roughness: .09, transparent: true, opacity: .1, depthWrite: false, side: THREE.DoubleSide });
         const edge = new THREE.MeshPhysicalMaterial({ color: 0xd4e7ed, metalness: .28, roughness: .15, transparent: true, opacity: .7 });
-        this.box(this.machine, 9.5, 3.0, 3.4, 0, -8.1, 0, black, .18);
+        this.box(this.machine, 9.5, 3.0, 3.4, 0, -8.1, 0, frame, .18);
         const badgeTexture = new THREE.TextureLoader().load(badgeUrl);
         badgeTexture.colorSpace = THREE.SRGBColorSpace;
         const badge = new THREE.Mesh(new THREE.CircleGeometry(.7, 48), new THREE.MeshBasicMaterial({ map: badgeTexture }));
         badge.position.set(0, -8.1, 1.71);
         this.machine.add(badge);
-        this.box(this.machine, 8.9, .25, 3.0, 0, -6.48, 0, black, .1);
+        this.box(this.machine, 8.9, .25, 3.0, 0, -6.48, 0, frame, .1);
         for (const x of [-4.48, 4.48]) {
-            this.box(this.machine, .62, 6.75, 1.5, x, -3.12, 0, black, .1);
+            this.box(this.machine, .62, 6.75, 1.5, x, -3.12, 0, frame, .1);
             const axle = new THREE.Mesh(new THREE.CylinderGeometry(.21, .21, .65, 24), silver);
             axle.rotation.z = Math.PI / 2;
             axle.position.set(x, 0, 0);
             this.machine.add(axle);
-            this.box(this.machine, 1.5, .1, 2.7, x * .85, -9.59, 0, black, .04);
+            this.box(this.machine, 1.5, .1, 2.7, x * .85, -9.59, 0, frame, .04);
         }
         // The base and uprights are siblings of the rotating chamber, so they never flip.
         this.box(this.chamber, 8.45, 11.7, .22, 0, 0, -.26, glass, .22);
@@ -142,8 +149,8 @@ export class GaltonBoard {
             for (const y of [-5.15, -2.6, 2.6, 5.15])
                 this.box(this.chamber, .16, .23, .58, x, y, 0, edge, .035);
         // Hopper and funnel walls match the rotating apparatus in the recording.
-        this.tube(this.chamber, [[-1.23, 5.15], [-1.05, 4.8], [-.55, 4.08], [0, 3.7], [.55, 4.08], [1.05, 4.8], [1.23, 5.15]].map(([x, y]) => new THREE.Vector3(x, y, .03)), .055, edge);
-        this.tube(this.chamber, [[-1.23, 5.15], [0, 5.25], [1.23, 5.15]].map(([x, y]) => new THREE.Vector3(x, y, .03)), .05, edge);
+        this.tube(this.chamber, [[-1.23, 5.45], [-1.05, 5.1], [-.55, 4.15], [0, 3.7], [.55, 4.15], [1.05, 5.1], [1.23, 5.45]].map(([x, y]) => new THREE.Vector3(x, y, .03)), .055, edge);
+        this.tube(this.chamber, [[-1.23, 5.45], [0, 5.55], [1.23, 5.45]].map(([x, y]) => new THREE.Vector3(x, y, .03)), .05, edge);
         for (const side of [-1, 1])
             this.tube(this.chamber, [[0, 3.7], [side * 1.8, 2.9], [side * 2.6, 1.8], [side * 3.92, -1.05]].map(([x, y]) => new THREE.Vector3(x, y, .03)), .045, edge);
         const pegGeo = new THREE.CylinderGeometry(.047, .047, .39, 12);
@@ -161,7 +168,7 @@ export class GaltonBoard {
             this.box(this.chamber, .025, 4.25, .39, (k - (ROWS + 1) / 2) * SPACING, -3.3, .015, edge, .008);
         this.box(this.chamber, 7.45, .075, .42, 0, -5.51, 0, edge, .025);
         // Gold theoretical normal curve is a 3D guide, never used to place balls.
-        const gold = new THREE.MeshBasicMaterial({ color: 0xd9a018, transparent: true, opacity: .9 });
+        const gold = new THREE.MeshBasicMaterial({ color: 0xc18400, toneMapped: false });
         // Normal expected count / 5 balls per shelf * .064 world units per shelf.
         const normalPeak = (800 / (Math.sqrt(ROWS) / 2 * Math.sqrt(2 * Math.PI))) / 5 * .064;
         const pts = [];
@@ -169,7 +176,7 @@ export class GaltonBoard {
             const x = (i / 100 - .5) * 7.2;
             pts.push(new THREE.Vector3(x, normalPeak * Math.exp(-.5 * (x / (Math.sqrt(ROWS) / 2 * SPACING)) ** 2), .34));
         }
-        this.tube(this.curve, pts, .025, gold);
+        this.tube(this.curve, pts, .045, gold);
         this.curve.position.y = FLOOR + .08;
         this.chamber.add(this.curve);
     }
@@ -181,16 +188,18 @@ export class GaltonBoard {
             j -= row + 1;
             row++;
         }
-        return new THREE.Vector3((j - row / 2) * .071, 3.77 + row * .070, -.17 + layer * .073);
+        const large = this.count <= 900;
+        return new THREE.Vector3((j - row / 2) * (large ? .098 : .071), 3.77 + row * (large ? .084 : .070), (large ? -.15 : -.17) + layer * (large ? .095 : .073));
     }
     private buildBalls() {
-        this.curve.scale.y = this.count / 800;
+        const packing = this.packing;
+        this.curve.scale.y = this.count / 800 * (packing.rowHeight / .064) * (5 / packing.columns);
         if (this.ballsMesh) {
             this.chamber.remove(this.ballsMesh);
             this.ballsMesh.geometry.dispose();
             (this.ballsMesh.material as THREE.Material).dispose();
         }
-        this.ballsMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(RADIUS, 10, 8), new THREE.MeshStandardMaterial({ color: 0xc7d1ce, metalness: .9, roughness: .22 }), this.count);
+        this.ballsMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(packing.radius, 16, 12), new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: .55, roughness: .28 }), this.count);
         this.ballsMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
         this.ballsMesh.frustumCulled = false;
         this.chamber.add(this.ballsMesh);
@@ -210,8 +219,8 @@ export class GaltonBoard {
             b.landed = false;
             b.start = this.targets[i].clone();
             // Slot packing happens only within the independently sampled destination.
-            const column = slot % 5, row = Math.floor(slot / 5);
-            b.target = new THREE.Vector3((bin - ROWS / 2) * SPACING + (column - 2) * .073 + (row % 2) * .012, FLOOR + RADIUS + row * .064, .03);
+            const packing = this.packing, column = slot % packing.columns, row = Math.floor(slot / packing.columns);
+            b.target = new THREE.Vector3((bin - ROWS / 2) * SPACING + (column - (packing.columns - 1) / 2) * packing.spacing + (row % 2) * .004, FLOOR + packing.radius + row * packing.rowHeight, .03 + (row % 2) * .05);
         }
     }
     flip() {
@@ -247,7 +256,7 @@ export class GaltonBoard {
     setSpeed(speed: number) { this.speed = speed; }
     setPaused(paused: boolean) { this.paused = paused; }
     showCurve(show: boolean) { this.curve.visible = show; }
-    resetView() { this.angle = .1; this.machine.rotation.y = this.angle; }
+    resetView() { this.angle = .25; this.machine.rotation.y = this.angle; }
     rotateView(delta: number) { this.angle = THREE.MathUtils.euclideanModulo(this.angle + delta, Math.PI * 2); this.machine.rotation.y = this.angle; }
     zoomBy(factor: number) {
         this.camera.zoom = THREE.MathUtils.clamp(this.camera.zoom * factor, .65, 1.8);
@@ -260,7 +269,7 @@ export class GaltonBoard {
         const entry = .42, step = .105, fall = .7;
         if (t < entry) {
             const q = t / entry;
-            return new THREE.Vector3(b.start.x * (1 - q), b.start.y + (TOP + RADIUS + .05 - b.start.y) * q * q, b.start.z * (1 - q) + .03 * q);
+            return new THREE.Vector3(b.start.x * (1 - q), b.start.y + (TOP + this.packing.radius + .05 - b.start.y) * q * q, b.start.z * (1 - q) + .03 * q);
         }
         const flight = t - entry;
         if (flight < ROWS * step) {
@@ -337,7 +346,8 @@ export class GaltonBoard {
         this.renderer.render(this.scene, this.camera);
         this.frame = requestAnimationFrame(this.animate);
     };
-    private resize() { const { width, height } = this.host.getBoundingClientRect(); this.renderer.setSize(width, height); this.camera.aspect = width / height; const distance = this.camera.aspect < .75 ? 39 : 32; this.camera.position.set(1.4, 3, distance); this.camera.lookAt(0, -1.9, 0); this.camera.updateProjectionMatrix(); }
+    private resize() { const width = this.host.clientWidth, height = this.host.clientHeight; if (!width || !height)
+        return; this.renderer.setSize(width, height); this.camera.aspect = width / height; const verticalFov = THREE.MathUtils.degToRad(this.camera.fov); const viewHeight = 17.4, viewWidth = 12.5; const distance = Math.max(viewHeight / (2 * Math.tan(verticalFov / 2)), viewWidth / (2 * Math.tan(verticalFov / 2) * this.camera.aspect)); this.camera.position.set(1.4, 1.5, distance); this.camera.lookAt(0, -1.9, 0); this.camera.updateProjectionMatrix(); }
     private pointerDown = (e: PointerEvent) => { this.dragX = e.clientX; this.dragStartX = e.clientX; this.dragging = true; this.moved = false; this.renderer.domElement.setPointerCapture(e.pointerId); };
     private pointerMove = (e: PointerEvent) => { if (this.dragging) {
         const dx = e.clientX - this.dragX;
@@ -358,7 +368,13 @@ export class GaltonBoard {
     private pointerCancel = () => { this.dragging = false; };
     dispose() { this.disposed = true; cancelAnimationFrame(this.frame); this.observer.disconnect(); this.renderer.domElement.removeEventListener('pointerdown', this.pointerDown); this.renderer.domElement.removeEventListener('pointermove', this.pointerMove); this.renderer.domElement.removeEventListener('pointerup', this.pointerUp); this.renderer.domElement.removeEventListener('pointercancel', this.pointerCancel); this.scene.traverse(obj => { if (obj instanceof THREE.Mesh) {
         obj.geometry.dispose();
-        for (const mat of Array.isArray(obj.material) ? obj.material : [obj.material])
+        for (const mat of Array.isArray(obj.material) ? obj.material : [obj.material]) {
+            for (const value of Object.values(mat)) {
+                if (value instanceof THREE.Texture)
+                    value.dispose();
+            }
             mat.dispose();
-    } }); this.renderer.dispose(); this.renderer.domElement.remove(); }
+        }
+    } if (obj instanceof THREE.DirectionalLight)
+        obj.shadow.dispose(); }); this.renderer.dispose(); this.renderer.forceContextLoss(); this.renderer.domElement.remove(); }
 }
