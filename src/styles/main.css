@@ -152,6 +152,14 @@
     @apply border-gray-300 bg-white;
   }
   
+  .social-links .btn-primary {
+    @apply min-h-9 justify-center px-0;
+  }
+
+  .social-links svg {
+    flex-shrink: 0;
+  }
+
   .experience-timeline {
     @apply ml-1.5 list-none space-y-12 border-l-2 border-white/15 pb-8 md:ml-5 md:space-y-16 md:pb-14;
   }
