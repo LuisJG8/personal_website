@@ -77,41 +77,62 @@ window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e
   }
 })
 
-// Mobile menu toggle
-const mobileMenuButton = document.getElementById('mobile-menu-button')
-const mobileMenu = document.getElementById('mobile-menu')
-
-mobileMenuButton?.addEventListener('click', () => {
-  const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true'
-  mobileMenuButton.setAttribute('aria-expanded', String(!isExpanded))
-  mobileMenu?.classList.toggle('hidden')
-})
-
-// Close mobile menu when clicking on a link
-const mobileNavLinks = mobileMenu?.querySelectorAll('a')
-mobileNavLinks?.forEach((link) => {
-  link.addEventListener('click', () => {
-    mobileMenu?.classList.add('hidden')
-    mobileMenuButton?.setAttribute('aria-expanded', 'false')
-  })
-})
-
-// Navbar scroll effect
+// One navigation tree adapts to its available width, including enlarged text.
 const navbar = document.getElementById('navbar')
+const navRow = navbar?.querySelector('.nav-row')
+const navLinks = document.getElementById('primary-links')
+const menuButton = document.getElementById('mobile-menu-button')
+const nativePopover = 'popover' in HTMLElement.prototype
 
-const handleScroll = () => {
-  const currentScrollY = window.scrollY
-
-  if (navbar) {
-    if (currentScrollY > 50) {
-      navbar.classList.add('bg-[#0f172a]/95', 'backdrop-blur-md', 'shadow-lg')
-    } else {
-      navbar.classList.remove('bg-[#0f172a]/95', 'backdrop-blur-md', 'shadow-lg')
+if (navbar && navRow && navLinks && menuButton) {
+  let previousWidth = 0
+  const isOpen = () => nativePopover ? navLinks.matches(':popover-open') : navLinks.hasAttribute('data-open')
+  const updateNavigation = () => {
+    const width = navRow.clientWidth
+    if (!navbar.classList.contains('is-wide') && width <= previousWidth) return
+    previousWidth = width
+    const wasOpen = isOpen()
+    navbar.classList.add('is-measuring', 'is-wide')
+    navLinks.removeAttribute('popover')
+    const fits = navRow.scrollWidth <= width
+    navbar.classList.toggle('is-wide', fits)
+    if (!fits && nativePopover) {
+      navLinks.setAttribute('popover', 'auto')
+      if (wasOpen) navLinks.showPopover()
     }
+    if (fits) navLinks.removeAttribute('data-open')
+    menuButton.setAttribute('aria-expanded', String(!fits && wasOpen))
+    requestAnimationFrame(() => navbar.classList.remove('is-measuring'))
   }
-}
 
-window.addEventListener('scroll', handleScroll, { passive: true })
+  if (nativePopover) {
+    navLinks.addEventListener('toggle', (event) => menuButton.setAttribute('aria-expanded', String(event.newState === 'open')))
+  } else {
+    // Older browsers retain the same links as a simple disclosure.
+    navLinks.removeAttribute('popover')
+    menuButton.addEventListener('click', () => {
+      const open = navLinks.toggleAttribute('data-open')
+      menuButton.setAttribute('aria-expanded', String(open))
+    })
+    document.addEventListener('click', (event) => {
+      if (!navbar.contains(event.target)) {
+        navLinks.removeAttribute('data-open')
+        menuButton.setAttribute('aria-expanded', 'false')
+      }
+    })
+    navbar.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && isOpen()) {
+        navLinks.removeAttribute('data-open')
+        menuButton.setAttribute('aria-expanded', 'false')
+        menuButton.focus()
+      }
+    })
+  }
+  const observer = new ResizeObserver(updateNavigation)
+  observer.observe(navRow)
+  observer.observe(navLinks)
+  updateNavigation()
+}
 
 // Switch between hosted events and speaking appearances.
 const talkFilters = document.querySelectorAll('#talk-filters button')

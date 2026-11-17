@@ -69,7 +69,6 @@ if (dialog) {
   const thumbnails = dialog.querySelector('#gallery-thumbnails')
   let gallery
   let currentIndex = 0
-  let trigger
 
   const showPhoto = (index) => {
     currentIndex = (index + gallery.photos.length) % gallery.photos.length
@@ -94,7 +93,6 @@ if (dialog) {
     button.addEventListener('click', () => {
       gallery = galleries[button.dataset.eventGallery]
       if (!gallery) return
-      trigger = button
       title.textContent = gallery.title
       thumbnails.replaceChildren(...gallery.photos.map((photo, index) => {
         const thumbnail = document.createElement('button')
@@ -114,7 +112,6 @@ if (dialog) {
         return thumbnail
       }))
       dialog.showModal()
-      document.documentElement.classList.add('gallery-open')
       thumbnails.scrollLeft = 0
       showPhoto(0)
     })
@@ -122,7 +119,6 @@ if (dialog) {
 
   dialog.querySelector('[data-gallery-previous]').addEventListener('click', () => showPhoto(currentIndex - 1))
   dialog.querySelector('[data-gallery-next]').addEventListener('click', () => showPhoto(currentIndex + 1))
-  dialog.querySelector('[data-gallery-close]').addEventListener('click', () => dialog.close())
 
   dialog.addEventListener('keydown', (event) => {
     if (event.altKey || event.ctrlKey || event.metaKey) return
@@ -132,15 +128,19 @@ if (dialog) {
     }
   })
 
-  // Native dialog behavior handles Escape and keeps keyboard focus inside the viewer.
-  dialog.addEventListener('click', (event) => {
-    if (event.target !== dialog) return
-    const bounds = dialog.getBoundingClientRect()
-    if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close()
-  })
-
-  dialog.addEventListener('close', () => {
-    document.documentElement.classList.remove('gallery-open')
-    trigger?.focus({ preventScroll: true })
-  })
+  // Native dialog behavior handles focus, Escape, and outside clicks.
+  // Retain light dismissal on browsers that do not support closedby yet.
+  if (!('closedBy' in HTMLDialogElement.prototype)) {
+    let pressedOutside = false
+    const outside = (event) => {
+      const bounds = dialog.getBoundingClientRect()
+      return event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom
+    }
+    dialog.addEventListener('pointerdown', (event) => { pressedOutside = outside(event) })
+    dialog.addEventListener('pointerup', (event) => {
+      if (pressedOutside && outside(event)) dialog.close()
+      pressedOutside = false
+    })
+    dialog.addEventListener('pointercancel', () => { pressedOutside = false })
+  }
 }
