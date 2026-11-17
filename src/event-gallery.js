@@ -1,4 +1,32 @@
 const galleries = {
+  'openai-build-week-miami': {
+    title: 'OpenAI Build Week Community Meetup - Miami',
+    photos: [
+      'OpenAI Build Week welcome display at The LAB Miami',
+      'Attendees watching a Codex presentation at the meetup',
+      'A view of the presentation and attendees from a table',
+      'The meetup audience during the OpenAI Build Week presentation',
+      'A presenter speaking beside the OpenAI Build Week screen',
+    ].map((alt, index) => {
+      const filename = `/images/events/openai-build-week-miami/photo-${String(index + 1).padStart(2, '0')}`
+      return { src: `${filename}.jpg`, thumbnail: `${filename}-thumb.jpg`, alt }
+    }),
+  },
+  'codex-community-meetup-september': {
+    title: 'Codex Community Meetup – Miami',
+    photos: [
+      'Meetup attendees posing together at The LAB Miami',
+      'Two attendees beside the OpenAI and Codex banner',
+      'An attendee working on a laptop during the meetup',
+      'Codex and OpenAI stickers on a table',
+      'Two attendees posing beside the Codex banner',
+      'Attendees talking beside the OpenAI banner',
+      'Three attendees smiling together at The LAB Miami',
+    ].map((alt, index) => {
+      const filename = `/images/events/codex-community-meetup-september/photo-${String(index + 1).padStart(2, '0')}`
+      return { src: `${filename}.jpg`, thumbnail: `${filename}-thumb.jpg`, alt }
+    }),
+  },
   'fiu-codex-workshop': {
     title: 'Codex Community Workshop Miami - FIU',
     photos: [
@@ -12,7 +40,7 @@ const galleries = {
     }),
   },
   'devday-miami': {
-    title: 'DevDay Exchange Community Hackathon: Miami',
+    title: 'DevDay Exchange Community Hackathon - Miami',
     photos: [
       'Attendees working together at The LAB Miami',
       'The LAB Miami entrance with an OpenAI event banner',
