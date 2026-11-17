@@ -651,8 +651,8 @@
     grid-column: 2;
     grid-row: 1;
     align-self: start;
-    inline-size: 5rem;
-    block-size: 5rem;
+    inline-size: 6rem;
+    block-size: 6rem;
     max-inline-size: none;
     aspect-ratio: 1;
     object-fit: contain;
@@ -685,8 +685,8 @@
     .event-card > img {
       grid-row: 1 / 4;
       align-self: center;
-      inline-size: 8rem;
-      block-size: 8rem;
+      inline-size: 12rem;
+      block-size: 12rem;
     }
   }
 
