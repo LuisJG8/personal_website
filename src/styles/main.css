@@ -76,6 +76,23 @@
 }
 
 @layer components {
+  .skip-link {
+    position: fixed;
+    inset-block-start: 0.75rem;
+    inset-inline-start: 1rem;
+    z-index: 100;
+    padding: 0.5rem 1rem;
+    color: var(--text-primary);
+    background: var(--surface);
+    border: 1px solid var(--control-line);
+    border-radius: 0.5rem;
+    transform: translateY(calc(-100% - 1rem));
+  }
+
+  .skip-link:focus-visible {
+    transform: none;
+  }
+
   .page-section {
     padding-block: clamp(2.75rem, 1.75rem + 3vw, 4.5rem);
   }
