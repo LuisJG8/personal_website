@@ -39,12 +39,16 @@ const themeToggle = document.getElementById('theme-toggle')
 const moonIcon = document.getElementById('theme-icon-moon')
 const sunIcon = document.getElementById('theme-icon-sun')
 
-const getStoredTheme = () => {
-  const stored = localStorage.getItem('theme')
-  if (stored === 'light' || stored === 'dark') return stored
-  // Check system preference
-  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+const systemTheme = window.matchMedia('(prefers-color-scheme: light)')
+const readTheme = () => {
+  try {
+    const stored = localStorage.getItem('theme')
+    return stored === 'light' || stored === 'dark' ? stored : null
+  } catch {
+    return null
+  }
 }
+let themeOverride = readTheme()
 
 const applyTheme = (theme) => {
   const html = document.documentElement
@@ -59,21 +63,33 @@ const applyTheme = (theme) => {
     sunIcon?.classList.add('hidden')
   }
 
-  localStorage.setItem('theme', theme)
+  html.classList.toggle('dark', theme === 'dark')
+  document.querySelector('meta[name="color-scheme"]').content = themeOverride ?? 'light dark'
+  themeToggle?.setAttribute('aria-label', `Switch to ${theme === 'light' ? 'dark' : 'light'} theme`)
 }
 
 // Initialize theme
-applyTheme(getStoredTheme())
+const applyPreferredTheme = () => applyTheme(themeOverride ?? (systemTheme.matches ? 'light' : 'dark'))
+applyPreferredTheme()
 
 themeToggle?.addEventListener('click', () => {
   const currentTheme = document.documentElement.classList.contains('light') ? 'light' : 'dark'
-  applyTheme(currentTheme === 'light' ? 'dark' : 'light')
+  const targetTheme = currentTheme === 'light' ? 'dark' : 'light'
+  // Toggling back to the system scheme restores automatic theme changes.
+  themeOverride = targetTheme === (systemTheme.matches ? 'light' : 'dark') ? null : targetTheme
+  try {
+    if (themeOverride) localStorage.setItem('theme', themeOverride)
+    else localStorage.removeItem('theme')
+  } catch { /* The control still works when storage is blocked. */ }
+  applyPreferredTheme()
 })
 
 // Listen for system theme changes
-window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
-  if (!localStorage.getItem('theme')) {
-    applyTheme(e.matches ? 'light' : 'dark')
+systemTheme.addEventListener('change', applyPreferredTheme)
+window.addEventListener('storage', (event) => {
+  if (event.key === 'theme' || event.key === null) {
+    themeOverride = readTheme()
+    applyPreferredTheme()
   }
 })
 
