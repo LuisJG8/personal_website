@@ -741,6 +741,23 @@
     border-radius: var(--radius);
   }
 
+  .project-graphic {
+    container-type: inline-size;
+    gap: 6%;
+    padding-inline: 6%;
+  }
+
+  .project-graphic > img {
+    inline-size: 25%;
+    max-inline-size: 7rem;
+    flex-shrink: 0;
+  }
+
+  .project-graphic > span {
+    font-size: 3rem;
+    font-size: clamp(1rem, 18cqi, 4.5rem);
+  }
+
   .project-feature p {
     line-height: 1.8;
     color: var(--text-secondary);
