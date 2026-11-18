@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    color-scheme: dark;
+    color-scheme: light dark;
     --page-bg: #0c121d;
     --surface: #131c2a;
     --surface-hover: #192436;
@@ -39,6 +39,10 @@
     --focus: #855500;
     --header-bg: rgb(247 248 251 / 0.96);
     background-color: var(--page-bg);
+  }
+
+  html.dark {
+    color-scheme: dark;
   }
 
   body {
